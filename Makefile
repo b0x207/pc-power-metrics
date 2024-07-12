@@ -3,7 +3,7 @@ OBJ := $(SRC:.c=.o)
 BUILD_DIR ?= build
 BUILD_OBJ := $(addprefix $(BUILD_DIR)/,$(OBJ))
 
-CFLAGS := -Wall -Werror
+CFLAGS := -Wall -Werror -Iinclude
 
 $(BUILD_DIR)/pc-power-metrics: $(BUILD_OBJ)
 	cc -o $@ $(CFLAGS) $<

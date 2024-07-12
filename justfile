@@ -11,5 +11,5 @@ setup:
     meson setup build --wipe
 
 set-suid:
-    sudo chmod u+s build/pc-power-metrics
     sudo chown root build/pc-power-metrics
+    sudo chmod u+s build/pc-power-metrics

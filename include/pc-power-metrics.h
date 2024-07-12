@@ -4,5 +4,6 @@
 #define POWERCAP_DIR "/sys/devices/virtual/powercap/intel-rapl"
 
 int check_powercap_dir();
+int check_rapl_enabled();
 
 #endif

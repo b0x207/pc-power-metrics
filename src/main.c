@@ -1,10 +1,13 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include <sys/types.h>
 #include "pc-power-metrics.h"
 
-int main() {
+int main(int argc, char **argv) {
+    int loop = argc > 1 && strcmp(argv[1], "1") == 0;
+
     if (check_powercap_dir() < 0 || check_rapl_enabled() < 0) {
         fprintf(stderr, "This computer must support Intel RAPL and have a powercap sysfs!\n");
         return EXIT_FAILURE;
@@ -18,21 +21,24 @@ int main() {
 
     fprintf(stderr, "Found %d top-level RAPL power zones\n", tl_power_zones);
 
-    for (int i = 0; i < tl_power_zones; i++) {
-        char *zone_path;
-        int size = snprintf(NULL, 0, "%s/intel-rapl:%d/energy_uj", POWERCAP_DIR, i) + 1;
+    do {
+        for (int i = 0; i < tl_power_zones; i++) {
+            char *zone_path;
+            int size = snprintf(NULL, 0, "%s/intel-rapl:%d/energy_uj", POWERCAP_DIR, i) + 1;
 
-        zone_path = malloc(sizeof(char) * size);
-        snprintf(zone_path, size, "%s/intel-rapl:%d/energy_uj", POWERCAP_DIR, i);
+            zone_path = malloc(sizeof(char) * size);
+            snprintf(zone_path, size, "%s/intel-rapl:%d/energy_uj", POWERCAP_DIR, i);
 
-        reading_result_t reading = take_reading(zone_path);
+            sample_result_t result = sample(zone_path);
 
-        if (1 == reading.is_error) {
-            return EXIT_FAILURE;
+            if (1 == result.is_error) {
+                fprintf(stderr, "Failed to sample power consumption\n");
+                return EXIT_FAILURE;
+            }
+
+            printf("%f Watts\n", result.value);
         }
-
-        printf("%ld\n", reading.value);
-    }
+    } while (loop);
 
     return EXIT_SUCCESS;
 }

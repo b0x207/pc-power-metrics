@@ -10,9 +10,15 @@ typedef struct reading_result_t {
     uint8_t is_error;
 } reading_result_t;
 
+typedef struct sample_result_t {
+    double value;
+    uint8_t is_error;
+} sample_result_t;
+
 int check_powercap_dir();
 int check_rapl_enabled();
 int enumerate_power_zones(char *base_dir);
 reading_result_t take_reading(char *zone_path);
+sample_result_t sample(char *zone_path);
 
 #endif
